@@ -90,18 +90,34 @@ retrieve_races<-function(meetingId,eventids){
   return(races)
 }
 
+#' Filter Scratchings
+#'
+#' @param meetingId DM meeting ID
+#' @param race Event number
+#' @param eventId Event from DB
+#' @keywords non-scratchings
+#' @export
+#' @examples
+#' retrieve_runners_ns(109868,1,1179641)
+retrieve_runners_ns<-function(meetingId,race,eventId){
+  runners<-retrieve_runners(meetingId,race,eventId)
+  runners<-runners[runners$Scratched=='FALSE',]
+  return(runners)
+}
+
 #' Retrieve event competitors
 #'
-#' @param race
-#' @param meetingId meeting ID to use for retrival
+#' @param meetingId DM meeting ID
+#' @param race Event number
+#' @param eventId Event from DB
 #' @keywords competitors
 #' @export
 #' @examples
-#' retrieve_runners( 1, 109501 )
-retrieve_runners<-function(race,meetingId){
-  events <- market::retrieve_markets( race, meetingId )
+#' retrieve_runners(109868,1,1179641)
+retrieve_runners<-function(meetingId,race,eventId){
+  events <- retrieve_event(eventId)
   #events <- jsonlite::fromJSON(paste("http://dw-staging-elb-1068016683.ap-southeast-2.elb.amazonaws.com/api/markets?event_number=",race,"&meeting_id=",meetingId,sep=""))
-  a<-paste('events$data$dw$`MTX PIR ACTUAL`$market$positions')
+  a<-paste('events$event_competitors')
   runners<-names(eval(parse(text=a)))
   meetids<-names(events$data$meetings)
   master<-data.frame(matrix(NA,length(runners),6))
@@ -109,7 +125,8 @@ retrieve_runners<-function(race,meetingId){
   colnames(master)<-c('Course','CompID','Matrix','Race','MeetingID','Odds')
   master$Race<-race
   master$MeetingID<-meetingId
-
+  eventId<-rep(eventId,nrow(master))
+  master$Scratched<-mapply(competitor::scratched,eventId,master$CompID)
   return(master)
 }
 
