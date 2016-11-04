@@ -176,3 +176,18 @@ event_status<-function( eventId ) {
   return (status)
 }
 
+
+#' Retrieve event name
+#'
+#' @param eventId Database ID of the event
+#' @keywords event
+#' @export
+#' @examples
+#' event_name( 1175769 )
+event_name<-function( eventId ) {
+  event<-retrieve_event(eventId)
+  a<-paste('event$name',sep="")
+  status<-eval(parse(text=a))
+
+  return (status)
+}
