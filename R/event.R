@@ -186,8 +186,9 @@ event_status<-function( eventId ) {
 #' event_name( 1175769 )
 event_name<-function( eventId ) {
   event<-retrieve_event(eventId)
-  a<-paste('event$name',sep="")
-  status<-eval(parse(text=a))
-
-  return (status)
+  a<-paste('event$race_data$track_type',sep="")
+  b<-paste('event$name',sep="")
+  if(length(eval(parse(text=a)))==0) type<-eval(parse(text=b))
+  else type<-eval(parse(text=a))
+  return (type)
 }
